@@ -5,6 +5,8 @@ The eeID Identification Service API provides endpoints for managing access token
 
 ![eeID Logo](https://eeid.ee/images/logo.png)
 
+<em>View the documentation at <a href="https://internetee.github.io/eeID-ident-api-doc">internetee.github.io/eeID-ident-api-doc</a>.</em>
+
 ## Install
 
 1. Install [Node JS](https://nodejs.org/).
