@@ -20,10 +20,6 @@ info:
 
     The token has a limited lifespan and will expire after 120 seconds. Clients should handle
     token expiration and generate a new one as necessary.
-
-externalDocs:
-  description: "Run In Postman"
-  url: https://god.gw.postman.com/run-collection/37760758-d649a287-c53e-483c-84d5-3b584a88b706?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D37760758-d649a287-c53e-483c-84d5-3b584a88b706%26entityType%3Dcollection%26workspaceId%3D38bd2f07-e8f0-4bd4-ae32-1917d18f19a8
 tags:
   - name: Access Token
     description: "Endpoint for obtaining authentication token."
