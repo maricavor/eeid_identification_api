@@ -21,4 +21,4 @@ jobs:
           github_token: ${{ secrets.PAT_TOKEN }}
           publish_dir: .
           force_orphan: true
-          exclude_assets: '.github,openapi,redocly.yaml,LICENSE,README.md'
+          exclude_assets: '.github,openapi,.redocly.yaml,LICENSE,README.md'
