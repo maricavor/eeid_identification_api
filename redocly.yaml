@@ -5,6 +5,7 @@ apis:
 extends:
   - recommended
 rules:
+  info-license: off
   no-unused-components: error
   no-server-example.com: off
 theme:
@@ -17,6 +18,7 @@ theme:
     generateCodeSamples:
       languages:  # Array of language config objects; indicates in which languages to generate code samples.
         - lang: curl
+        - lang: Ruby
         - lang: Node.js
         - lang: JavaScript
         - lang: PHP

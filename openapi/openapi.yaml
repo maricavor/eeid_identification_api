@@ -1,122 +1,91 @@
 openapi: 3.1.0
 info:
   version: 1.0.0
-  title: Example API
-  termsOfService: https://example.com/terms/
+  title: eeID Identification Service API
+  termsOfService: https://meedia.internet.ee/files/Terms_of_use_eeID.pdf
   contact:
     name: Contact our support
-    email: contact@example.com
-    url: http://example.com/contact
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    email: info@internet.ee
+    url: https://www.internet.ee/eis
   x-logo:
-    url: 'https://redocly.github.io/openapi-template/logo.png'
-    altText: OpenAPI example logo
-  description: >
-    This is an **example** API to demonstrate features of the OpenAPI
-    specification.
-
+    url: 'https://eeid.ee/images/logo.png'
+    altText: eeID
+  description: |
     # Introduction
 
-    This API definition is intended to to be a good starting point for
-    describing your API in [OpenAPI/Swagger
-    format](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md).
+    This API provides endpoints for managing authentication tokens and handling identification requests.
+    The authentication mechanism is based on OAuth2, using a token-based approach to secure access to
+    the identification requests. Clients must obtain a token by providing valid credentials to access
+    the protected resources.
 
-    It also demonstrates features of the
-    [create-openapi-repo](https://github.com/Redocly/create-openapi-repo) tool
-    and the [Redoc](https://github.com/Redocly/Redoc) documentation engine. Beyond
-    the standard OpenAPI syntax, we use a few 
-    [vendor extensions](https://github.com/Redocly/Redoc/blob/main/docs/redoc-vendor-extensions.md).
+    The token has a limited lifespan and will expire after 120 seconds. Clients should handle
+    token expiration and generate a new one as necessary.
 
-    # OpenAPI Specification
-
-    The goal of The OpenAPI Specification is to define a standard, language-agnostic interface to REST APIs which
-    allows both humans and computers to discover and understand the capabilities
-    of the service without access to source
-    code, documentation, or through network traffic inspection. When properly
-    defined via OpenAPI, a consumer can 
-    understand and interact with the remote service with a minimal amount of
-    implementation logic. Similar to what
-    interfaces have done for lower-level programming, OpenAPI removes the
-    guesswork in calling the service.
 externalDocs:
-  description: "Find out how to create a GitHub repo for your OpenAPI definition."
-  url: 'https://github.com/Redocly/create-openapi-repo'
+  description: "Run In Postman"
+  url: https://god.gw.postman.com/run-collection/37760758-d649a287-c53e-483c-84d5-3b584a88b706?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D37760758-d649a287-c53e-483c-84d5-3b584a88b706%26entityType%3Dcollection%26workspaceId%3D38bd2f07-e8f0-4bd4-ae32-1917d18f19a8
 tags:
-  - name: Echo
-    description: "Example echo operations."
-  - name: User
-    description: "Example actions on user accounts."
-  - name: Admin
-    description: "Example operations reserved for administrators."
-  - name: Info
-    description: "Example operations for retrieving information."
-  - name: Tag
-    description: "This is a tag description."
-x-tagGroups:
-  - name: General
-    tags:
-      - User
-      - Info
-      - Echo
-  - name: Administration
-    tags:
-      - Admin
+  - name: Access Token
+    description: "Endpoint for obtaining authentication token."
+  - name: Identification Requests
+    description: "Endpoints for managing identification requests."
+  - name: Webhook
+    description: |
+      A Webhook to receive notification about successful completion of created Identification Request. 
+      To be able to receive notification, this API needs to be implemented and deployed by the client. 
+      The webhook URL is configured by the client in the [eeID manager](https://eeid.ee) when creating the identification service and must contain the path `eeid/webhooks/identification_requests`.
+
+      To ensure the integrity and authenticity of the request, an HMAC signature is included in the request header. Clients must verify this webhook request as follows:
+
+      **Verifying the HMAC Signature**:
+        - Upon receiving the webhook, extract the `X-HMAC-Signature` from the request headers.
+        - Recreate the HMAC signature with the received payload and your `client_secret`.
+        - Compare the recreated signature with the signature from the header. If they match, the request is verified as authentic.
+        - Example in Ruby:
+          ```ruby
+          received_signature = request.headers['X-HMAC-Signature']
+          expected_signature = OpenSSL::HMAC.hexdigest('SHA256', secret_key, request.raw_post)
+          if received_signature != expected_signature
+            raise "Invalid HMAC signature"
+          end
+          ```
+
+      The event is considered acknowledged if the endpoint responds with a successful status code (`200`, `201` or `204`) within 10 seconds.
+      Any other status code or a lack of response is treated as a delivery failure, leading to up to 3 retries.
+      This may result in the same event being delivered multiple times in exceptional cases.
 servers:
-  - url: https://{tenant}/api/v1
-    variables:
-      tenant:
-        default: www
-        description: Your tenant id
-  - url: https://example.com/api/v1
+  - url: https://eeid.ee
 paths:
-  '/users/{username}':
-    $ref: 'paths/users_{username}.yaml'
-  '/user':
-    $ref: 'paths/user.yaml'
-  '/user/list':
-    $ref: 'paths/user-status.yaml'
-  /pathItem:
-    $ref: paths/pathItem.yaml
-  /pathItemWithExamples:
-    $ref: paths/pathItemWithExamples.yaml
-  '/echo':
-    $ref: 'paths/echo.yaml'
+  '/api/auth/v1/token':
+    $ref: 'paths/token.yaml'
+  '/api/ident/v1/identification_requests':
+    get:
+      $ref: 'paths/list_identification_requests.yaml'
+    post:
+      $ref: 'paths/create_identification_request.yaml'
+  '/api/ident/v1/identification_requests/{id}':
+    $ref: 'paths/show_identification_request.yaml'
+  '/api/ident/v1/identification_requests/{id}/proof_of_identity':
+    $ref: 'paths/get_proof_of_identity.yaml'
 components:
   securitySchemes:
-    main_auth:
-      description: "Example description text of the OAuth2 scheme."
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: http://example.com/api/oauth/dialog
-          scopes:
-            'read:users': read user info
-            'write:users': modify or remove users
-    api_key:
-      description: "Example description text of the API key scheme."
-      type: apiKey
-      in: header
-      name: api_key
-    basic_auth:
+    BasicAuth:
       type: http
       scheme: basic
+      description: |
+        Clients must provide a Base64 encoded string of `client_id:client_secret` in the Authorization header, where:
+        
+        - **client_id**: The client ID provided to the identification service.
+        - **client_secret**: The client secret associated with the client ID.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    HMAC:
+      type: "apiKey"
+      in: "header"
+      name: "X-HMAC-Signature"
+      description: "HMAC signature for securing the webhook request."
 webhooks:
-  userInfo:
-    post:
-      summary: New user webhook
-      description: "Information about a new user in the system."
-      operationId: userInfo
-      tags:
-        - Info
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: 'components/schemas/User.yaml'
-      responses:
-        '200':
-          description: "Successfully retrieved information about a new user."
-      security:
-        - api_key: []
+  identificationRequestCompleted:
+    $ref: 'webhooks/identification_request_completed.yaml'
