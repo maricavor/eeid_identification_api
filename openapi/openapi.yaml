@@ -6,7 +6,7 @@ info:
   contact:
     name: Contact our support
     email: info@internet.ee
-    url: https://www.internet.ee/eis
+    url: https://eeid.ee
   x-logo:
     url: 'https://eeid.ee/images/logo.png'
     altText: eeID
